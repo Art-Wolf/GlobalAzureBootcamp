@@ -1,0 +1,74 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Condition": {
+                "actions": {
+                    "Compose": {
+                        "inputs": "@concat('Hello ', triggerBody()?['name'])",
+                        "runAfter": {},
+                        "type": "Compose"
+                    },
+                    "Response": {
+                        "inputs": {
+                            "body": "@outputs('Compose')",
+                            "statusCode": 200
+                        },
+                        "kind": "http",
+                        "runAfter": {
+                            "Compose": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Response"
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "Response_2": {
+                            "inputs": {
+                                "body": "Missing Name Parameter",
+                                "statusCode": 400
+                            },
+                            "kind": "http",
+                            "runAfter": {},
+                            "type": "Response"
+                        }
+                    }
+                },
+                "expression": {
+                    "and": [
+                        {
+                            "greater": [
+                                "@if(empty(triggerBody()?['name']), 0, 1)",
+                                0
+                            ]
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "If"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {
+            "manual": {
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "kind": "Http",
+                "type": "Request"
+            }
+        }
+    }
+}
